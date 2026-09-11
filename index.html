@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0a0f1d">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Identity Shield — Problem 4.1 Mitigation Dashboard</title>
+  <link rel="stylesheet" href="/static/styles.css?v=2.1">
+  <script src="/static/qr_generator.js?v=2.1"></script>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <div class="brand">
+        <div class="brand-icon">🛡️</div>
+        <div class="brand-title">
+          <h1>IDENTITY SHIELD</h1>
+          <p>Cryptographic Identity Compartmentalization & Leak Attribution Console</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div id="network-badge" class="network-badge" title="Connect from any phone, tablet or PC on your network">
+          <span class="pulse-dot"></span>
+          <span id="network-ip-display">Detecting Network IP...</span>
+          <button id="copy-network-btn" class="btn btn-sm btn-secondary" onclick="copyNetworkUrl()">Copy LAN URL</button>
+        </div>
+        <button class="btn btn-primary" onclick="openQrModal()" title="Scan to open instantly on your phone">
+          📱 Scan QR
+        </button>
+        <button class="btn btn-secondary" onclick="handleResetDemo()" title="Reset to clean demonstration state">
+          🔄 Reset Demo
+        </button>
+        <a href="/api/export" class="btn btn-secondary">
+          ⬇ Export Vault JSON
+        </a>
+      </div>
+    </header>
+
+    <!-- Cyber Command HUD Ticker -->
+    <div class="cyber-hud-ticker">
+      <div class="hud-item">
+        <span class="hud-pill active">● ACTIVE</span>
+        <span>RELAY NODE: <b>0.0.0.0:3000</b></span>
+      </div>
+      <span class="hud-divider">|</span>
+      <div class="hud-item">
+        <span class="hud-pill cyan">CRYPTO</span>
+        <span>CIPHER: <b>HMAC-SHA256 / AES-256</b></span>
+      </div>
+      <span class="hud-divider">|</span>
+      <div class="hud-item">
+        <span class="hud-pill active">COMPLIANCE</span>
+        <span>SPEC-P16: <b>GDPR ART. 17 / CCPA READY</b></span>
+      </div>
+      <span class="hud-divider">|</span>
+      <div class="hud-item">
+        <span class="hud-pill cyan">LEAK SHIELD</span>
+        <span id="hud-threat-status">CORRELATION PROTECTION: <b>ARMED</b></span>
+      </div>
+    </div>
+
+    <!-- Metrics Bar -->
+    <section class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-label">Protected Identities</div>
+        <div class="metric-value" id="stat-total">0</div>
+        <div class="metric-sub">Vault entries registered</div>
+      </div>
+      <div class="metric-card success">
+        <div class="metric-label">Active Forwarders</div>
+        <div class="metric-value" id="stat-active" style="color: var(--accent-emerald);">0</div>
+        <div class="metric-sub">Healthy isolation channels</div>
+      </div>
+      <div class="metric-card warning">
+        <div class="metric-label">Ephemeral / Trials</div>
+        <div class="metric-value" id="stat-ephemeral" style="color: var(--accent-amber);">0</div>
+        <div class="metric-sub">Auto-expiring signups</div>
+      </div>
+      <div class="metric-card danger">
+        <div class="metric-label">Blocked / Leaks</div>
+        <div class="metric-value" id="stat-leaks" style="color: var(--accent-rose);">0</div>
+        <div class="metric-sub">Neutralized exposure vectors</div>
+      </div>
+      <div class="metric-card gauge-card" id="metric-risk-card">
+        <div class="risk-gauge-wrapper">
+          <svg class="risk-gauge-svg" viewBox="0 0 70 70">
+            <circle class="risk-gauge-bg" cx="35" cy="35" r="30"></circle>
+            <circle class="risk-gauge-meter" id="risk-gauge-circle" cx="35" cy="35" r="30"></circle>
+          </svg>
+          <div class="risk-gauge-center">
+            <div class="risk-gauge-pct" id="stat-risk">0%</div>
+          </div>
+        </div>
+        <div>
+          <div class="metric-label">Exposure Risk Score</div>
+          <div class="metric-sub" id="stat-risk-sub" style="font-size: 12px; font-weight: 700; color: var(--accent-emerald);">Threat Index: Minimal</div>
+          <div style="font-size: 10px; color: var(--text-dim); margin-top: 2px;">Identity blast radius: Isolated</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Identity Topology Graph -->
+    <section class="topology-card" id="section-topology">
+      <div class="topology-header">
+        <div class="card-title" style="margin-bottom: 0;">
+          <span>Compartmentalization Topology</span>
+          <span class="card-title-tag">Problem 4.1 Air-Gap Visualizer</span>
+        </div>
+        <div class="topology-legend">
+          <span class="legend-item"><span class="legend-dot" style="background: #3b82f6;"></span> Root Identity</span>
+          <span class="legend-item"><span class="legend-dot" style="background: var(--accent-purple);"></span> Core Pod</span>
+          <span class="legend-item"><span class="legend-dot" style="background: var(--accent-cyan);"></span> Commercial Pod</span>
+          <span class="legend-item"><span class="legend-dot" style="background: var(--accent-amber);"></span> Ephemeral Pod</span>
+          <span class="legend-item"><span class="legend-dot" style="background: var(--accent-rose);"></span> Rogue Broker (Blocked)</span>
+        </div>
+      </div>
+
+      <div class="topology-container">
+        <svg class="topology-svg" id="topology-svg" viewBox="0 0 850 180">
+          <defs>
+            <linearGradient id="grad-cyan" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#3b82f6" />
+              <stop offset="100%" stop-color="#00e5ff" />
+            </linearGradient>
+            <filter id="glow-cyan" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="3" result="blur" />
+              <feComposite in="SourceGraphic" in2="blur" operator="over" />
+            </filter>
+          </defs>
+
+          <!-- Links -->
+          <line x1="120" y1="90" x2="260" y2="35" class="topo-link active" />
+          <line x1="120" y1="90" x2="260" y2="90" class="topo-link active" />
+          <line x1="120" y1="90" x2="260" y2="145" class="topo-link active" />
+
+          <line x1="400" y1="35" x2="550" y2="35" class="topo-link active" />
+          <line x1="400" y1="90" x2="550" y2="90" class="topo-link active" id="topo-link-commercial" />
+          <line x1="400" y1="145" x2="550" y2="145" class="topo-link active" />
+
+          <!-- Blocked Broker Link -->
+          <line x1="720" y1="90" x2="550" y2="90" class="topo-link blocked" id="topo-link-broker" />
+
+          <!-- Shield Icon on Blocked Link -->
+          <circle cx="635" cy="90" r="14" fill="#180c1d" stroke="#f43f5e" stroke-width="1.5" />
+          <text x="635" y="94" fill="#f43f5e" font-size="12" text-anchor="middle" font-weight="bold">🛡️</text>
+
+          <!-- Root Node -->
+          <g class="topo-node" transform="translate(30, 65)">
+            <rect width="90" height="50" rx="8" fill="#0c1938" stroke="#3b82f6" stroke-width="1.5" />
+            <text x="45" y="22" fill="#93c5fd" font-size="10" font-weight="bold" text-anchor="middle">ROOT ANCHOR</text>
+            <text x="45" y="36" fill="#60a5fa" font-size="9" font-family="monospace" text-anchor="middle">Protected</text>
+          </g>
+
+          <!-- Tier Pods -->
+          <!-- Tier 1: Core -->
+          <g class="topo-node" transform="translate(260, 15)">
+            <rect width="140" height="40" rx="6" fill="#17112d" stroke="#a855f7" stroke-width="1.5" />
+            <text x="70" y="20" fill="#d8b4fe" font-size="10" font-weight="bold" text-anchor="middle">TIER 1: CORE POD</text>
+            <text x="70" y="32" fill="#a855f7" font-size="8" font-family="monospace" text-anchor="middle">Gov / Banking / Primary</text>
+          </g>
+
+          <!-- Tier 2: Commercial -->
+          <g class="topo-node" transform="translate(260, 70)">
+            <rect width="140" height="40" rx="6" fill="#082035" stroke="#00e5ff" stroke-width="1.5" filter="url(#glow-cyan)" />
+            <text x="70" y="20" fill="#a5f3fc" font-size="10" font-weight="bold" text-anchor="middle">TIER 2: COMMERCIAL</text>
+            <text x="70" y="32" fill="#00e5ff" font-size="8" font-family="monospace" text-anchor="middle">Vendor 1-to-1 Bound</text>
+          </g>
+
+          <!-- Tier 3: Ephemeral -->
+          <g class="topo-node" transform="translate(260, 125)">
+            <rect width="140" height="40" rx="6" fill="#291806" stroke="#f59e0b" stroke-width="1.5" />
+            <text x="70" y="20" fill="#fde68a" font-size="10" font-weight="bold" text-anchor="middle">TIER 3: EPHEMERAL</text>
+            <text x="70" y="32" fill="#f59e0b" font-size="8" font-family="monospace" text-anchor="middle">Auto-Expiring Trials</text>
+          </g>
+
+          <!-- Connected Vendors -->
+          <g class="topo-node" transform="translate(550, 70)">
+            <rect width="115" height="40" rx="6" fill="#0c172e" stroke="#64748b" stroke-width="1" />
+            <text x="57" y="20" fill="#cbd5e1" font-size="10" font-weight="600" text-anchor="middle">ONLINE SIGN-UP</text>
+            <text x="57" y="32" fill="#94a3b8" font-size="8" font-family="monospace" text-anchor="middle">Store / Trial / SaaS</text>
+          </g>
+
+          <!-- Blocked Rogue Broker -->
+          <g class="topo-node" id="topo-rogue-broker" transform="translate(710, 68)">
+            <rect width="125" height="44" rx="6" fill="#2b0a13" stroke="#f43f5e" stroke-width="1.5" stroke-dasharray="4 2" />
+            <text x="62" y="20" fill="#fca5a5" font-size="10" font-weight="bold" text-anchor="middle">⚠️ ROGUE BROKER</text>
+            <text x="62" y="34" fill="#f87171" font-size="8" font-family="monospace" text-anchor="middle">Blocked Resale</text>
+          </g>
+        </svg>
+      </div>
+    </section>
+
+    <!-- Main Workspace Grid -->
+    <div class="dashboard-grid">
+      
+      <!-- Left Column: Controls & Simulator -->
+      <div class="sidebar-col">
+        
+        <!-- Alias Generator Card -->
+        <div id="section-generate" class="card">
+          <div class="card-title">
+            <span>Generate Alias</span>
+            <span class="card-title-tag">HMAC Tagged</span>
+          </div>
+
+          <form id="generate-form">
+            <div class="form-group">
+              <label class="form-label" for="gen-service">Service Name *</label>
+              <input type="text" id="gen-service" class="form-control" placeholder="e.g. Substack, CloudTrial, Acme Store" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="gen-domain">Expected Sender Domain</label>
+              <input type="text" id="gen-domain" class="form-control" placeholder="e.g. substack.com (for leak detection)">
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="gen-tier">Security Tier</label>
+                <select id="gen-tier" class="form-control">
+                  <option value="commercial" selected>Tier 2: Commercial</option>
+                  <option value="ephemeral">Tier 3: Ephemeral (TTL)</option>
+                  <option value="core">Tier 1: Core Anchor</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="gen-ttl">TTL (Days)</label>
+                <input type="number" id="gen-ttl" class="form-control" placeholder="Permanent" disabled>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="gen-target">Forwarding Destination</label>
+              <input type="email" id="gen-target" class="form-control" value="user@example.com">
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 8px;">
+              ⚡ Generate Protected Address
+            </button>
+          </form>
+        </div>
+
+        <!-- Threat & Leak Simulator Card -->
+        <div id="section-simulator" class="card">
+          <div class="card-title">
+            <span>Leak Attribution Sandbox</span>
+            <span class="card-title-tag" style="background: rgba(244,63,94,0.1); color: var(--accent-rose); border-color: rgba(244,63,94,0.3);">Live Test</span>
+          </div>
+          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 14px;">
+            Simulate an inbound email to test whether sender domains match the registered service.
+          </p>
+
+          <form id="simulator-form">
+            <div class="form-group">
+              <label class="form-label" for="sim-alias-select">Recipient Alias</label>
+              <select id="sim-alias-select" class="form-control" required></select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="sim-sender-email">Simulated Sender Address</label>
+              <input type="email" id="sim-sender-email" class="form-control" placeholder="e.g. promotions@unsolicited-broker.com" required>
+            </div>
+
+            <div class="form-group" style="display: flex; align-items: center; gap: 8px; margin-top: 10px;">
+              <input type="checkbox" id="sim-auto-revoke" style="cursor: pointer;" checked>
+              <label for="sim-auto-revoke" style="font-size: 12px; color: var(--text-muted); cursor: pointer;">
+                Auto-trigger Kill-Switch if leak detected
+              </label>
+            </div>
+
+            <button type="submit" class="btn btn-secondary" style="width: 100%; justify-content: center; margin-top: 8px;">
+              🔍 Inspect Inbound Message
+            </button>
+          </form>
+
+          <div id="sim-result" class="sim-result"></div>
+        </div>
+
+        <!-- Advanced Dark Web Breach & Broker Collusion Radar Card -->
+        <div id="section-threat-intel" class="card">
+          <div class="card-title">
+            <span>Dark Web & Broker Radar</span>
+            <span class="card-title-tag" style="background: rgba(139,92,246,0.15); color: var(--accent-purple); border-color: rgba(139,92,246,0.4);">Intel Scanner</span>
+          </div>
+          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
+            Scan registered aliases across simulated dark web dumps and broker collusion graphs (Acxiom, LiveRamp, Experian).
+          </p>
+
+          <div class="form-group">
+            <label class="form-label" for="intel-alias-select">Select Target Alias</label>
+            <select id="intel-alias-select" class="form-control" style="font-size: 12px;"></select>
+          </div>
+
+          <button type="button" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 6px;" onclick="handleThreatIntelScan()">
+            📡 Run Dark Web Exposure Scan
+          </button>
+
+          <div id="intel-scan-result" style="margin-top: 12px; display: none;"></div>
+        </div>
+
+        <!-- Real-Time SOC Security Audit Feed Card -->
+        <div class="soc-card" id="section-soc">
+          <div class="soc-header">
+            <div class="card-title" style="margin-bottom: 0; font-size: 14px;">
+              <span>SOC Live Event Stream</span>
+            </div>
+            <span class="soc-live-badge"><span class="pulse-dot"></span> LIVE AUDIT</span>
+          </div>
+          <div class="soc-feed" id="soc-event-feed">
+            <div class="soc-item soc-info">
+              <span class="soc-timestamp">READY</span>
+              <span class="soc-tag tag-cyan">BOOT</span>
+              <div class="soc-text">Cryptographic relay initialized. Zero-trust isolation active.</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Column: Vault Table & Problem 4.1 Knowledge Hub -->
+      <div class="main-col">
+        
+        <!-- Vault Table Card -->
+        <div id="section-vault" class="card">
+          <div class="vault-toolbar">
+            <div class="card-title" style="margin-bottom: 0; display: flex; align-items: center; gap: 10px;">
+              <span>Identity Vault</span>
+              <span id="vault-count-badge" class="vault-count-badge">0 entries</span>
+            </div>
+
+            <div class="filter-group">
+              <input type="text" id="vault-search" class="form-control search-input" placeholder="🔍 Search service or alias...">
+              <select id="filter-tier" class="form-control" style="width: 130px;">
+                <option value="">All Tiers</option>
+                <option value="commercial">Commercial</option>
+                <option value="ephemeral">Ephemeral</option>
+                <option value="core">Core</option>
+              </select>
+              <select id="filter-status" class="form-control" style="width: 120px;">
+                <option value="">All Status</option>
+                <option value="ACTIVE">Active</option>
+                <option value="REVOKED">Revoked</option>
+                <option value="EXPIRED">Expired</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Desktop Table View -->
+          <div class="table-responsive desktop-only">
+            <table class="vault-table">
+              <thead>
+                <tr>
+                  <th onclick="sortTable('service_name')" class="sortable-th" title="Click to sort by Service">
+                    Service <span id="sort-service_name" class="sort-icon">⇅</span>
+                  </th>
+                  <th onclick="sortTable('tier')" class="sortable-th" title="Click to sort by Tier">
+                    Tier <span id="sort-tier" class="sort-icon">⇅</span>
+                  </th>
+                  <th>Pseudonymous Relay Alias</th>
+                  <th onclick="sortTable('status')" class="sortable-th" title="Click to sort by Status">
+                    Status <span id="sort-status" class="sort-icon">⇅</span>
+                  </th>
+                  <th onclick="sortTable('expires_at')" class="sortable-th" title="Click to sort by Lifespan">
+                    Lifespan <span id="sort-expires_at" class="sort-icon">⇅</span>
+                  </th>
+                  <th style="text-align: right; min-width: 140px;">Quick Actions</th>
+                </tr>
+              </thead>
+              <tbody id="vault-tbody">
+                <!-- Dynamically injected rows -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Smartphone Mobile Cards Container -->
+          <div id="vault-mobile-cards" class="mobile-only mobile-cards-container">
+            <!-- Dynamically injected mobile cards -->
+          </div>
+        </div>
+
+        <!-- Problem 4.1 Threat Architecture Hub -->
+        <div id="section-guide" class="card">
+          <div class="card-title">
+            <span>Problem 4.1 Architecture & Threat Defense Knowledge Hub</span>
+          </div>
+
+          <div class="tabs">
+            <button class="tab-btn active" data-tab="tab-trilemma">The Identity Trilemma</button>
+            <button class="tab-btn" data-tab="tab-adhoc">Why Ad-Hoc Defenses Fail</button>
+            <button class="tab-btn" data-tab="tab-tiers">Three-Tier Model</button>
+            <button class="tab-btn" data-tab="tab-gdpr">Legal & GDPR Remedies</button>
+            <button class="tab-btn" data-tab="tab-ppid-lab">🔬 PPID Cryptographic Lab</button>
+          </div>
+
+          <div id="tab-trilemma" class="tab-content active">
+            <div class="explainer-grid">
+              <div class="explainer-box">
+                <h4>Universal Foreign Key</h4>
+                <p>Routine sign-ups turn an email into a global database foreign key. Data aggregators (Acxiom, Experian) stitch profiles across breaches using <code>SHA256(email)</code> as the join index.</p>
+              </div>
+              <div class="explainer-box">
+                <h4>Attribution Void</h4>
+                <p>Without isolated addresses, when an inbox receives marketing spam or spear-phishing lures, the user has zero technical mechanism to prove which organization leaked or sold their contact information.</p>
+              </div>
+              <div class="explainer-box">
+                <h4>Phantom Retention</h4>
+                <p>Clicking "Unsubscribe" only halts automated marketing sends; it does NOT remove personal data from vendor backups, data lakes, or analytics silos.</p>
+              </div>
+            </div>
+          </div>
+
+          <div id="tab-adhoc" class="tab-content">
+            <div class="explainer-grid">
+              <div class="explainer-box">
+                <h4>Plus-Addressing Flaw</h4>
+                <p><code>user+tag@gmail.com</code> is trivially stripped by modern data hygiene scripts via regex: <code>s/\+.*@/@/</code>, instantly exposing the canonical inbox.</p>
+              </div>
+              <div class="explainer-box">
+                <h4>Catch-All Domain Flaw</h4>
+                <p><code>service@userdomain.com</code> leaks the root apex domain. Graph databases easily cluster all registrations under the same owner using DNS/WHOIS records.</p>
+              </div>
+              <div class="explainer-box">
+                <h4>Burner Mail Flaw</h4>
+                <p>10-minute temporary inboxes destroy account recovery continuity and are heavily blacklisted by anti-fraud risk engines (Sift, IPQualityScore).</p>
+              </div>
+            </div>
+          </div>
+
+          <div id="tab-tiers" class="tab-content">
+            <div class="explainer-grid">
+              <div class="explainer-box">
+                <h4>Tier 1: Core Anchor</h4>
+                <p>Banking, government, critical healthcare. Never entered on public forms. Protected by FIDO2 WebAuthn / Passkeys.</p>
+              </div>
+              <div class="explainer-box">
+                <h4>Tier 2: Commercial Relay</h4>
+                <p>Reputable SaaS, shopping, persistent subscriptions. 1 unique HMAC alias per service with bi-directional reverse routing.</p>
+              </div>
+              <div class="explainer-box">
+                <h4>Tier 3: Ephemeral Layer</h4>
+                <p>Whitepapers, downloads, webinars, untrusted forums. Configured with automated TTL auto-expiry and instantaneous kill-switches.</p>
+              </div>
+            </div>
+          </div>
+
+          <div id="tab-gdpr" class="tab-content">
+            <div class="explainer-grid">
+              <div class="explainer-box">
+                <h4>GDPR Art. 17 Erasure</h4>
+                <p>Because each alias is strictly 1-to-1 with a service, any subsequent email received after an erasure request provides undeniable forensic proof of non-compliance.</p>
+              </div>
+              <div class="explainer-box">
+                <h4>GDPR Art. 5(1)(e) Storage Limit</h4>
+                <p>Service providers must enforce automated retention schedules and cryptographic purge receipts rather than retaining trial signups forever.</p>
+              </div>
+              <div class="explainer-box">
+                <h4>PPID Architecture</h4>
+                <p>Platforms should issue Pairwise Pseudonymous Identifiers (PPIDs) per client application, eliminating cross-database tracking by design.</p>
+              </div>
+            </div>
+          </div>
+
+          <div id="tab-ppid-lab" class="tab-content">
+            <div class="explainer-box" style="margin-bottom: 16px;">
+              <h4>Interactive Pairwise Pseudonymous Identifier (PPID) & Blinded Hash Proof</h4>
+              <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
+                Demonstrates how enterprise databases implement <b>GDPR Article 25 (Privacy by Design)</b> using our reference SQL blueprint (<code>schema_privacy_first_auth.sql</code>). Enter an email to verify that independent partner services receive mathematically orthogonal identifiers that cannot be correlated.
+              </p>
+              <div style="display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap;">
+                <input type="email" id="ppid-lab-email" class="form-control" placeholder="user@example.com" value="jane.doe@personal.me" style="flex: 1; min-width: 220px;">
+                <button type="button" class="btn btn-primary btn-sm" onclick="handlePpidProofLab()">⚡ Compute Cryptographic Proof</button>
+              </div>
+              <div id="ppid-lab-result" style="display: none; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 6px; padding: 12px; font-family: monospace; font-size: 11px;"></div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- QR Code Modal (Instant Smartphone Sync) -->
+  <div id="qr-modal" class="modal-backdrop hidden" onclick="closeQrModal(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3 style="font-size: 16px; font-weight: 700; color: var(--text-main);">📱 Smartphone Instant Sync</h3>
+        <button class="modal-close-btn" onclick="closeQrModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="qr-container" style="padding: 20px 0; text-align: center;">
+        <!-- Injected by IdentityShieldQR -->
+      </div>
+      <div class="modal-footer" style="display: flex; gap: 10px; justify-content: flex-end;">
+        <button class="btn btn-secondary btn-sm" onclick="copyNetworkUrl()">Copy LAN URL</button>
+        <button class="btn btn-primary btn-sm" onclick="closeQrModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- GDPR Article 17 Legal Notice Generator Modal -->
+  <div id="gdpr-modal" class="modal-backdrop hidden" onclick="closeGdprModal(event)">
+    <div class="modal-box" style="max-width: 650px;" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3 style="font-size: 16px; font-weight: 700; color: var(--accent-cyan);">⚖️ GDPR Article 17 — Formal Erasure Notice</h3>
+        <button class="modal-close-btn" onclick="closeGdprModal()">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 16px 0;">
+        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px; line-height: 1.5;">
+          Because each pseudonymous alias is 1-to-1 bound to a single vendor, this notice provides indisputable cryptographic proof that the organization retains and processes your personal identifier without continuous legal basis.
+        </p>
+        <textarea id="gdpr-letter-text" class="form-control" rows="12" style="font-family: monospace; font-size: 11px; line-height: 1.6;" readonly></textarea>
+      </div>
+      <div class="modal-footer" style="display: flex; gap: 10px; justify-content: flex-end;">
+        <button class="btn btn-primary btn-sm" onclick="copyGdprNotice()">📋 Copy Notice to Clipboard</button>
+        <button class="btn btn-secondary btn-sm" onclick="closeGdprModal()">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Individual Alias QR Modal (Fill into Phone Signup Forms) -->
+  <div id="alias-qr-modal" class="modal-backdrop hidden" onclick="closeAliasQrModal(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3 style="font-size: 15px; font-weight: 700; color: var(--accent-cyan);" id="alias-qr-title">📱 Scan Alias into Mobile Form</h3>
+        <button class="modal-close-btn" onclick="closeAliasQrModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="alias-qr-container" style="padding: 18px 0; text-align: center;"></div>
+      <div class="modal-footer" style="display: flex; gap: 8px; justify-content: flex-end;">
+        <button class="btn btn-secondary btn-sm" id="alias-qr-copy-btn" onclick="copyActiveAliasFromModal()">📋 Copy Address</button>
+        <button class="btn btn-primary btn-sm" onclick="closeAliasQrModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Floating Action Button (FAB) -->
+  <button class="mobile-fab mobile-only" onclick="switchMobileTab('section-generate', null)" title="Generate New Protected Alias">
+    ⚡
+  </button>
+
+  <!-- Smartphone Bottom Thumb Navigation Bar -->
+  <nav class="mobile-bottom-nav mobile-only">
+    <button class="mobile-nav-item active" onclick="switchMobileTab('section-vault', this)">
+      <span class="nav-icon">🛡️</span>
+      <span class="nav-text">Vault</span>
+    </button>
+    <button class="mobile-nav-item" onclick="switchMobileTab('section-generate', this)">
+      <span class="nav-icon">⚡</span>
+      <span class="nav-text">New</span>
+    </button>
+    <button class="mobile-nav-item" onclick="switchMobileTab('section-simulator', this)">
+      <span class="nav-icon">🔍</span>
+      <span class="nav-text">Trace</span>
+    </button>
+    <button class="mobile-nav-item" onclick="switchMobileTab('section-guide', this)">
+      <span class="nav-icon">📖</span>
+      <span class="nav-text">Guide</span>
+    </button>
+  </nav>
+
+  <script src="/static/app.js?v=2.1"></script>
+</body>
+</html>

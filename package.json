@@ -1,0 +1,23 @@
+{
+  "name": "identity-shield-network",
+  "version": "1.0.0",
+  "description": "Cryptographic Identity Shield & Leak Attribution Console with Cross-Device Network IP Support",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "keywords": [
+    "cybersecurity",
+    "privacy",
+    "identity-protection",
+    "alias-generator",
+    "leak-attribution",
+    "network-server"
+  ],
+  "author": "Antigravity Pair Programmer",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

@@ -1,0 +1,253 @@
+{
+  "identities": [
+    {
+      "id": 1,
+      "alias_email": "apex-bank.c89a01f2@relay.identityshield.local",
+      "service_name": "Apex National Bank",
+      "service_domain": "apexbank.com",
+      "tier": "core",
+      "target_forward_email": "user@personal.me",
+      "created_at": "2026-09-01T08:00:00.000Z",
+      "expires_at": null,
+      "status": "ACTIVE",
+      "revocation_reason": null,
+      "notes": "High-security Tier 1 Anchor for banking & KYC verification"
+    },
+    {
+      "id": 2,
+      "alias_email": "govid-health.d14f2b90@relay.identityshield.local",
+      "service_name": "GovID Health Portal",
+      "service_domain": "govid.gov",
+      "tier": "core",
+      "target_forward_email": "user@personal.me",
+      "created_at": "2026-09-02T09:30:00.000Z",
+      "expires_at": null,
+      "status": "ACTIVE",
+      "revocation_reason": null,
+      "notes": "National digital identity & healthcare record anchor"
+    },
+    {
+      "id": 3,
+      "alias_email": "netflix.8a3c94f1@relay.identityshield.local",
+      "service_name": "Netflix Streaming",
+      "service_domain": "netflix.com",
+      "tier": "commercial",
+      "target_forward_email": "user@personal.me",
+      "created_at": "2026-09-04T14:15:00.000Z",
+      "expires_at": null,
+      "status": "ACTIVE",
+      "revocation_reason": null,
+      "notes": "Entertainment monthly subscription"
+    },
+    {
+      "id": 4,
+      "alias_email": "amazon.b72e11d0@relay.identityshield.local",
+      "service_name": "Amazon Marketplace",
+      "service_domain": "amazon.com",
+      "tier": "commercial",
+      "target_forward_email": "user@personal.me",
+      "created_at": "2026-09-05T11:20:00.000Z",
+      "expires_at": null,
+      "status": "ACTIVE",
+      "revocation_reason": null,
+      "notes": "E-commerce vendor 1-to-1 compartmentalized vector"
+    },
+    {
+      "id": 5,
+      "alias_email": "substack.3f5d88c2@relay.identityshield.local",
+      "service_name": "Substack Publications",
+      "service_domain": "substack.com",
+      "tier": "commercial",
+      "target_forward_email": "user@personal.me",
+      "created_at": "2026-09-06T16:40:00.000Z",
+      "expires_at": null,
+      "status": "ACTIVE",
+      "revocation_reason": null,
+      "notes": "Cybersecurity & tech newsletter feeds"
+    },
+    {
+      "id": 6,
+      "alias_email": "spotify.71e499a6@relay.identityshield.local",
+      "service_name": "Spotify Audio",
+      "service_domain": "spotify.com",
+      "tier": "commercial",
+      "target_forward_email": "user@personal.me",
+      "created_at": "2026-09-07T10:05:00.000Z",
+      "expires_at": null,
+      "status": "ACTIVE",
+      "revocation_reason": null,
+      "notes": "Audio & podcast streaming account"
+    },
+    {
+      "id": 7,
+      "alias_email": "clouddev-trial.e41b99a2@relay.identityshield.local",
+      "service_name": "CloudDev Free Trial",
+      "service_domain": "clouddev.io",
+      "tier": "ephemeral",
+      "target_forward_email": "user@personal.me",
+      "created_at": "2026-09-09T12:00:00.000Z",
+      "expires_at": "2026-09-23T12:00:00.000Z",
+      "status": "ACTIVE",
+      "revocation_reason": null,
+      "notes": "14-day disposable sandbox credentials"
+    },
+    {
+      "id": 8,
+      "alias_email": "saas-demo.52a819c4@relay.identityshield.local",
+      "service_name": "SaaS Metrics Demo",
+      "service_domain": "saasmetrics.app",
+      "tier": "ephemeral",
+      "target_forward_email": "user@personal.me",
+      "created_at": "2026-09-10T15:30:00.000Z",
+      "expires_at": "2026-09-17T15:30:00.000Z",
+      "status": "REVOKED",
+      "revocation_reason": "LEAK_DETECTED: Unauthorized sender marketing@rogue-spam-broker.com",
+      "notes": "7-day product trial demonstration"
+    },
+    {
+      "id": 9,
+      "alias_email": "techweekly.dfc853d0@relay.identityshield.local",
+      "service_name": "TechWeekly Newsletter",
+      "service_domain": "techweekly.io",
+      "tier": "ephemeral",
+      "target_forward_email": "user@personal.me",
+      "created_at": "2026-09-08T09:00:00.000Z",
+      "expires_at": "2026-09-22T09:00:00.000Z",
+      "status": "REVOKED",
+      "revocation_reason": "LEAK_DETECTED: Unauthorized sender promotions@spam-brokers.com",
+      "notes": "Automated kill-switch triggered after data broker domain mismatch"
+    },
+    {
+      "id": 10,
+      "alias_email": "conf2026-wifi.90c8e11a@relay.identityshield.local",
+      "service_name": "Conference 2026 Wi-Fi",
+      "service_domain": "conf2026.net",
+      "tier": "ephemeral",
+      "target_forward_email": "user@personal.me",
+      "created_at": "2026-08-01T08:00:00.000Z",
+      "expires_at": "2026-08-02T23:59:59.000Z",
+      "status": "REVOKED",
+      "revocation_reason": "LEAK_DETECTED: Unauthorized sender kradit2008@gmail.com",
+      "notes": "Single-day event sign-up. Inbound relay auto-expired."
+    },
+    {
+      "id": 11,
+      "alias_email": "mobile-test-app.98c0f3f21458e70f@relay.identityshield.local",
+      "service_name": "Mobile Test App",
+      "service_domain": "mobiletest.com",
+      "tier": "ephemeral",
+      "target_forward_email": "user@example.com",
+      "created_at": "2026-09-11T07:39:24.611Z",
+      "expires_at": "2026-09-18T07:39:24.611Z",
+      "status": "REVOKED",
+      "revocation_reason": "LEAK_DETECTED: Unauthorized sender promotions@broker-leak.net",
+      "notes": null
+    },
+    {
+      "id": 12,
+      "alias_email": "jinesh.9683a43f2707c6b1@relay.identityshield.local",
+      "service_name": "jinesh",
+      "service_domain": "google.com",
+      "tier": "ephemeral",
+      "target_forward_email": "user@example.com",
+      "created_at": "2026-09-11T10:29:31.874Z",
+      "expires_at": "2026-09-25T10:29:31.874Z",
+      "status": "ACTIVE",
+      "revocation_reason": null,
+      "notes": null
+    }
+  ],
+  "audit_logs": [
+    {
+      "id": 6,
+      "alias_id": 9,
+      "event_type": "LEAK_DETECTED",
+      "timestamp": "2026-09-11T04:15:22.000Z",
+      "details": "Inbound from promotions@spam-brokers.com. Domain mismatch with techweekly.io. Kill-switch activated."
+    },
+    {
+      "id": 5,
+      "alias_id": 9,
+      "event_type": "REVOKED",
+      "timestamp": "2026-09-11T04:15:23.000Z",
+      "details": "Terminated routing bridge for techweekly.dfc853d0@relay.identityshield.local"
+    },
+    {
+      "id": 4,
+      "alias_id": 3,
+      "event_type": "INBOUND_AUTHORIZED",
+      "timestamp": "2026-09-11T05:02:10.000Z",
+      "details": "Inbound from billing@netflix.com. Correlated with netflix.com: FORWARD_ALLOWED"
+    },
+    {
+      "id": 3,
+      "alias_id": 7,
+      "event_type": "GENERATED",
+      "timestamp": "2026-09-09T12:00:00.000Z",
+      "details": "Generated for CloudDev Free Trial (Tier: ephemeral, TTL: 14d)"
+    },
+    {
+      "id": 2,
+      "alias_id": 3,
+      "event_type": "GENERATED",
+      "timestamp": "2026-09-04T14:15:00.000Z",
+      "details": "Generated for Netflix Streaming (Tier: commercial)"
+    },
+    {
+      "id": 1,
+      "alias_id": 1,
+      "event_type": "GENERATED",
+      "timestamp": "2026-09-01T08:00:00.000Z",
+      "details": "Generated for Apex National Bank (Tier: core)"
+    },
+    {
+      "id": 7,
+      "alias_id": 10,
+      "event_type": "LEAK_DETECTED",
+      "timestamp": "2026-09-11T07:17:31.001Z",
+      "details": "Inbound from kradit2008@gmail.com. Correlated: false"
+    },
+    {
+      "id": 8,
+      "alias_id": 11,
+      "event_type": "GENERATED",
+      "timestamp": "2026-09-11T07:39:24.611Z",
+      "details": "Generated for Mobile Test App (Tier: ephemeral)"
+    },
+    {
+      "id": 9,
+      "alias_id": 11,
+      "event_type": "INBOUND_AUTHORIZED",
+      "timestamp": "2026-09-11T07:39:24.622Z",
+      "details": "Inbound from support@mobiletest.com. Correlated: true"
+    },
+    {
+      "id": 10,
+      "alias_id": 11,
+      "event_type": "LEAK_DETECTED",
+      "timestamp": "2026-09-11T07:39:24.632Z",
+      "details": "Inbound from promotions@broker-leak.net. Correlated: false"
+    },
+    {
+      "id": 11,
+      "alias_id": 6,
+      "event_type": "INBOUND_AUTHORIZED",
+      "timestamp": "2026-09-11T08:54:50.758Z",
+      "details": "Inbound from billing@spotify.com. Correlated: true"
+    },
+    {
+      "id": 12,
+      "alias_id": 8,
+      "event_type": "LEAK_DETECTED",
+      "timestamp": "2026-09-11T08:55:13.485Z",
+      "details": "Inbound from marketing@rogue-spam-broker.com. Correlated: false"
+    },
+    {
+      "id": 13,
+      "alias_id": 12,
+      "event_type": "GENERATED",
+      "timestamp": "2026-09-11T10:29:31.874Z",
+      "details": "Generated for jinesh (Tier: ephemeral)"
+    }
+  ]
+}
